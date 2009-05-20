@@ -28,15 +28,14 @@ class PDFSequencePicture(BaseSequencePicture):
     THIN_FEATURE_OFFSET = 3
     FEATURE_SPACING = 12
     
-    def __init__(self, sequence):
+    def __init__(self, sequence_length):
         self.w, self.h = landscape(letter)
-        BaseSequencePicture.__init__(self, len(sequence), int(self.w))
+        BaseSequencePicture.__init__(self, sequence_length, 500)
         
         self.data_fp = StringIO()
         self.canvas = canvas.Canvas(self.data_fp, pagesize=(self.w,self.h))
 
-        self.seq = sequence
-        self.seqlen = len(sequence)
+        self.seqlen = sequence_length
 
         # conversion factor
         self.seq_to_canvas = float((self.w - 2*self.SEQUENCE_BASE) /
