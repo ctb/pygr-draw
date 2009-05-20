@@ -27,4 +27,6 @@ p = pygr_draw.draw_annotation_maps(genome[sequence_name], (annotations_map,),
 
 image = p.finalize()
 
-open('simple-example.png', 'w').write(image)
+filename = 'simple-example.png'
+open(filename, 'w').write(image)
+print 'Output in', filename

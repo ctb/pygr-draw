@@ -1,0 +1,37 @@
+git repo for source code: http://github.com/ctb/pygr-draw/
+
+---
+
+To run .py files in doc/, you have to set up the environment properly.
+First, set the PYTHONPATH: start in the top level pygr-draw directory and do,
+::
+
+   export PYTHONPATH=`pwd`
+   cd doc/
+
+Then you can run the various examples, e.g. ::
+
+   python simple-example.py
+   python group-example.py
+
+To run all the doctests, do ::
+
+   python run-doctests.py *.txt
+
+or to run a single one, do ::
+
+   python run-doctests.py simple-example.txt
+
+---
+
+From lyorn, to view your files thru the Web: ::
+
+   mkdir ~/.html
+   ln -fs /path/to/pygr-draw /u/<username>/.html
+
+(replace /path/to/ and <username> appropriately). Now the files should
+be accessible at
+
+   http://lyorn.idyll.org/~<username>/pygr-draw/
+
+---
