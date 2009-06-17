@@ -30,38 +30,21 @@ class AnnotationGroup(object):
 
 default_arg = object()
 class FeatureWrapper(object):
-    def __init__(self, factory, values):
-        self.factory = factory
-        self.feature = feature
-        self.values = values
+    def __init__(self, parent, feature, values):
+        self.parent = parent            # factory class
+        self.feature = feature          # *unwrapped* feature
+        self.values = values            # override values, e.g. color
 
-    def __call__(self, attrname, default=default_arg):
+    def __getattr__(self, wrapped_feature, attrname, default=default_arg):
+        # override?
         if attrname in self.values:
             return self.values[attrname]
-        
+
+        # nope; use getattr.
         if default is not default_arg:
             return getattr(self.feature, attrname, default)
         else:
             return getattr(self.feature, attrname)
-
-class SequenceWrapper(object):
-    def __init__(self, factory, sequence, values):
-        self.factory = factory
-        self.sequence = sequence
-        self.values = values
-
-    def __call__(self, attrname, default=default_arg):
-        if attrname in self.values:
-            return self.values[attrname]
-        elif attrname == 'sequence':
-            return self.sequence
-        elif attrname == 'name':
-            return self.sequence.id
-        
-        if default is not default_arg:
-            return getattr(self.sequence, attrname, default)
-        else:
-            return getattr(self.sequence, attrname)
 
 class FeatureWrapperFactory(object):
     def __init__(self, klass=FeatureWrapper, **values):
@@ -70,6 +53,21 @@ class FeatureWrapperFactory(object):
 
     def __call__(self, feature):
         return self.klass(self, feature, self.values)
+
+class SequenceWrapper(FeatureWrapper):
+    def __getattr__(self, attrname, default=default_arg):
+        # override?
+        if attrname in self.values:
+            return self.values[attrname]
+        elif attrname == 'name':
+            return self.feature.id
+
+        # nope; use getattr.
+        if default is not default_arg:
+            return getattr(self.feature, attrname, default)
+        else:
+            return getattr(self.feature, attrname)
+
 
 class SequenceWrapperFactory(FeatureWrapperFactory):
     def __init__(self, klass=SequenceWrapper, **values):
@@ -107,15 +105,14 @@ class _PictureCoordAnnotGroup(object):
         self.color = color
         self.text_length = text_length
 
-def convert_to_image_coords(seq, all_annotations, picture_obj, default_color,
+def convert_to_image_coords(seq, slice, picture_obj, default_color,
                             wrapper):
     """
     @CTB
     """
     
-    new_annot_d = convert_object_coords(all_annotations, seq.start,
-                                        len(seq), picture_obj,
-                                        default_color, wrapper)
+    new_annot_d = convert_object_coords(slice, seq.start, len(seq),
+                                        picture_obj, default_color, wrapper)
 
     # build nlmsa
     new_map = cnestedlist.NLMSA('test', mode='memory', use_virtual_lpo=True)
@@ -137,40 +134,46 @@ def convert_to_image_coords(seq, all_annotations, picture_obj, default_color,
     new_map.build()
     return (new_map, max_text_length)
 
-def default_wrapper(annot):
-    default_indicator = object()
-    def f(name, default=default_indicator):
-        if default is default_indicator:
-            return getattr(annot, name)
-        else:
-            return getattr(annot, name, default)
-
-    return f
-
-def convert_object_coords(all_annotations, seq_start, seq_length, picture_obj,
+def convert_object_coords(slice, seq_start, seq_length, picture_obj,
                           default_color, wrapper):
     """
-    @CTB
+    Build a set of annotation objects in 'picture' coordinate space.
+    
+    'slice' is an NLMSASlice object containing the objects aligned to
+    our sequence interval of interest.
+
+    'seq_start' is the interval start, in parent path sequence coordinates.
+
+    'seq_length' is the interval length (stop - start).
+
+    'picture_obj' is the drawing object (e.g. BitmapSequencePicture).
+
+    'default_color' is the default color.
+
+    'wrapper' is a callable that returns an object that will be queried for
+    name, color, group, and (if 'group' is true) annots attributes.
     """
     image_width = len(picture_obj.genome['bitmap'])
     length_ratio = float(image_width) / float(seq_length)
 
     d = {}
     
-    for n, (seq, annot, _) in enumerate(all_annotations.edges()):
-        if wrapper:
-            getter = wrapper(annot)
-        else:
-            getter = default_wrapper(annot)
-            
-        name = getter('name', '')
-        is_group = getter('group', False)
-        color = getter('color', default_color)
+    for n, (seq, feature, _) in enumerate(slice.edges()):
+        # Here, 'seq' is the source sequence, or the sequence to which
+        # the annotation/alignment is aligned; 'feature' is the object
+        # with information about the aligned sequence.
         
-        text_length = picture_obj._calc_textsize(name)[0]
+        if wrapper:
+            feature = wrapper(feature)
+            
+        is_group = getattr(feature, 'group', False)
+        color = getattr(feature, 'color', default_color)
+        
+        name = getattr(feature, 'name', '')
+        text_size = picture_obj._calc_textsize(name)
+        text_length = text_size[0]
 
         sequence = seq
-        print repr(sequence)
         corrected_start = sequence.start - seq_start
         feature_start = float(corrected_start) * length_ratio
 
@@ -183,18 +186,19 @@ def convert_object_coords(all_annotations, seq_start, seq_length, picture_obj,
         block_stop = int(round(block_stop))
         block_stop = max(block_stop, 0)
 
+        # make sure features are at least size 1 even after scaling!
         if block_start == block_stop:
             block_stop += 1
 
         if not is_group:
-            new_annot = _PictureCoordAnnot(name, block_start, block_stop,
+            new_feature = _PictureCoordAnnot(name, block_start, block_stop,
                                            color, feature_start, text_length)
         else:
-            # still have to transform annot blocks
-            
+            # for group annotations, we need to transform sub-annotation
+            # blocks into the right coordinate space, too.
             sub_annots = []
 
-            for (start, stop) in getter('annots'):
+            for (start, stop) in feature.annots:
                 new_start = start - seq_start
                 new_start = float(new_start) * length_ratio
                 new_stop = stop - seq_start
@@ -208,10 +212,10 @@ def convert_object_coords(all_annotations, seq_start, seq_length, picture_obj,
 
                 sub_annots.append((new_start, new_stop))
 
-            new_annot = _PictureCoordAnnotGroup(name, sub_annots, color,
+            new_feature = _PictureCoordAnnotGroup(name, sub_annots, color,
                                                 feature_start, text_length)
             
-        # add into dict
-        d[n] = new_annot
+        # add new 'picture' feature into dict...
+        d[n] = new_feature
 
     return d
