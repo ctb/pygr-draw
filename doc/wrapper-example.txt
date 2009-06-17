@@ -1,0 +1,47 @@
+Using pygr-draw with alignments (NLMSAs)
+----------------------------------------
+
+First, import the necessary components, load the genome/FASTA database in,
+and pick two sequences:
+
+ >>> from pygr import seqdb, cnestedlist
+ >>> genome = seqdb.BlastDB('example.fa')
+ >>> seq1 = genome['chrI']
+ >>> seq2 = genome['chrII']
+
+Build an alignment object (a.k.a. "NLMSA"):
+
+ >>> al = cnestedlist.NLMSA('chicago', mode='memory', pairwiseMode=True)
+
+Create some (arbitrary) alignments:
+
+ >>> al += seq1
+ >>> al[seq1[50:500]] += seq2[100:550]
+ >>> al[seq1[2000:2100]] += seq2[400:500]
+ >>> al.build()
+
+Now, import pygr_draw and select the bitmap output:
+
+ >>> import pygr_draw
+ >>> picture_class = pygr_draw.BitmapSequencePicture
+
+We also need to build a wrapper to extract drawing information (name,
+color, etc.) from the alignment objects returned from the NLMSA; the
+generic way to do that is to use a ``SequenceWrapperFactory``:
+
+ >>> from pygr_draw.annotation import SequenceWrapperFactory
+ >>> wrapper = SequenceWrapperFactory(color='red')
+
+Now, draw!
+
+ >>> p = pygr_draw.draw_annotation_maps(seq1,
+ ...                                    (al,),
+ ...                                    picture_class=picture_class,
+ ...                                    wrappers=(wrapper,))
+
+...and save.
+
+ >>> image = p.finalize()
+ >>> open('wrapper-example.png', 'w').write(image)
+
+.. image:: wrapper-example.png

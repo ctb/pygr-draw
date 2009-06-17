@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
-<title>Using pygr-draw with simple annotations</title>
+<title>Using pygr-draw with alignments (NLMSAs)</title>
 <style type="text/css">
 
 /*
@@ -284,76 +284,67 @@ ul.auto-toc {
 </style>
 </head>
 <body>
-<div class="document" id="using-pygr-draw-with-simple-annotations">
-<h1 class="title">Using pygr-draw with simple annotations</h1>
+<div class="document" id="using-pygr-draw-with-alignments-nlmsas">
+<h1 class="title">Using pygr-draw with alignments (NLMSAs)</h1>
 
 <p>First, import the necessary components, load the genome/FASTA database in,
-and pick a sequence:</p>
+and pick two sequences:</p>
 <blockquote>
 <pre class="doctest-block">
-&gt;&gt;&gt; from pygr import seqdb
+&gt;&gt;&gt; from pygr import seqdb, cnestedlist
 &gt;&gt;&gt; genome = seqdb.BlastDB('example.fa')
-&gt;&gt;&gt; sequence_name = 'chrI'
+&gt;&gt;&gt; seq1 = genome['chrI']
+&gt;&gt;&gt; seq2 = genome['chrII']
 </pre>
 </blockquote>
-<p>Now, import pygr_draw and the Annotation class:</p>
+<p>Build an alignment object (a.k.a. &quot;NLMSA&quot;):</p>
+<blockquote>
+<pre class="doctest-block">
+&gt;&gt;&gt; al = cnestedlist.NLMSA('chicago', mode='memory', pairwiseMode=True)
+</pre>
+</blockquote>
+<p>Create some (arbitrary) alignments:</p>
+<blockquote>
+<pre class="doctest-block">
+&gt;&gt;&gt; al += seq1
+&gt;&gt;&gt; al[seq1[50:500]] += seq2[100:550]
+&gt;&gt;&gt; al[seq1[2000:2100]] += seq2[400:500]
+&gt;&gt;&gt; al.build()
+</pre>
+</blockquote>
+<p>Now, import pygr_draw and select the bitmap output:</p>
 <blockquote>
 <pre class="doctest-block">
 &gt;&gt;&gt; import pygr_draw
-&gt;&gt;&gt; from pygr_draw import Annotation
-</pre>
-</blockquote>
-<p>Instantiate the sequence picture class; in this case, use a
-<tt class="docutils literal"><span class="pre">BitmapSequencePicture</span></tt> to produce a PNG.  You can also use
-<tt class="docutils literal"><span class="pre">PDFSequencePicture</span></tt> to create PDFs, with otherwise identical code.</p>
-<blockquote>
-<pre class="doctest-block">
 &gt;&gt;&gt; picture_class = pygr_draw.BitmapSequencePicture
-&gt;&gt;&gt; colors = picture_class.colors
 </pre>
 </blockquote>
-<p>Create a bunch of overlapping annotations in various colors:</p>
+<p>We also need to build a wrapper to extract drawing information (name,
+color, etc.) from the alignment objects returned from the NLMSA; the
+generic way to do that is to use a <tt class="docutils literal"><span class="pre">SequenceWrapperFactory</span></tt>:</p>
 <blockquote>
 <pre class="doctest-block">
-&gt;&gt;&gt; annotations1 = {}
-&gt;&gt;&gt; annotations1['exon1'] = Annotation('exon1', sequence_name, 0, 500,
-...                                    color=colors.blue)
-&gt;&gt;&gt; annotations1['exon2'] = Annotation('exon2', sequence_name, 200, 500,
-...                                    color=colors.green)
-&gt;&gt;&gt; annotations1['exon3'] = Annotation('exon3', sequence_name, 250, 300,
-...                                    color=colors.black)
-</pre>
-<pre class="doctest-block">
-&gt;&gt;&gt; for i in range(250, 500, 10):
-...    name = 'exon%d' % (i + 4)
-...    start = i
-...    end = 2000
-...    annotations1[name] = Annotation(name, sequence_name, start, end,
-...                                    color=colors.red)
+&gt;&gt;&gt; from pygr_draw.annotation import SequenceWrapperFactory
+&gt;&gt;&gt; wrapper = SequenceWrapperFactory(color='red')
 </pre>
 </blockquote>
-<p>Convert the annotations into an NLMSA annotations map:</p>
+<p>Now, draw!</p>
 <blockquote>
 <pre class="doctest-block">
-&gt;&gt;&gt; annotations_map = pygr_draw.create_annotation_map(annotations1, genome)
+&gt;&gt;&gt; p = pygr_draw.draw_annotation_maps(seq1,
+...                                    (al,),
+...                                    picture_class=picture_class,
+...                                    wrappers=(wrapper,))
 </pre>
 </blockquote>
-<p>Draw 'em:</p>
-<blockquote>
-<pre class="doctest-block">
-&gt;&gt;&gt; p = pygr_draw.draw_annotation_maps(genome[sequence_name][:4000],
-...                                    (annotations_map,),
-...                                    picture_class=picture_class)
-</pre>
-</blockquote>
-<p>And then save the image:</p>
+<p>...and save.</p>
 <blockquote>
 <pre class="doctest-block">
 &gt;&gt;&gt; image = p.finalize()
-&gt;&gt;&gt; open('simple-example.png', 'w').write(image)
+&gt;&gt;&gt; open('wrapper-example.png', 'w').write(image)
 </pre>
 </blockquote>
-<img alt="simple-example.png" src="simple-example.png" />
+<img alt="wrapper-example.png" src="wrapper-example.png" />
 </div>
 </body>
 </html>
