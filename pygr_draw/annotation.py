@@ -28,6 +28,53 @@ class AnnotationGroup(object):
 
         self.color = color
 
+default_arg = object()
+class FeatureWrapper(object):
+    def __init__(self, factory, values):
+        self.factory = factory
+        self.feature = feature
+        self.values = values
+
+    def __call__(self, attrname, default=default_arg):
+        if attrname in self.values:
+            return self.values[attrname]
+        
+        if default is not default_arg:
+            return getattr(self.feature, attrname, default)
+        else:
+            return getattr(self.feature, attrname)
+
+class SequenceWrapper(object):
+    def __init__(self, factory, sequence, values):
+        self.factory = factory
+        self.sequence = sequence
+        self.values = values
+
+    def __call__(self, attrname, default=default_arg):
+        if attrname in self.values:
+            return self.values[attrname]
+        elif attrname == 'sequence':
+            return self.sequence
+        elif attrname == 'name':
+            return self.sequence.id
+        
+        if default is not default_arg:
+            return getattr(self.sequence, attrname, default)
+        else:
+            return getattr(self.sequence, attrname)
+
+class FeatureWrapperFactory(object):
+    def __init__(self, klass=FeatureWrapper, **values):
+        self.klass = klass
+        self.values = values
+
+    def __call__(self, feature):
+        return self.klass(self, feature, self.values)
+
+class SequenceWrapperFactory(FeatureWrapperFactory):
+    def __init__(self, klass=SequenceWrapper, **values):
+        FeatureWrapperFactory.__init__(self, klass=klass, **values)
+
 ###
 
 class _PictureCoordAnnot(object):
