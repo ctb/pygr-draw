@@ -18,7 +18,7 @@ from pygr import cnestedlist
 def draw_annotation_maps(seq, annot_maps,
                          default_colors=None,
                          picture_class=BitmapSequencePicture,
-                         wrapper=None):
+                         wrappers=None):
     # make sure the list of default colors is the same length as the list
     # of input annotation maps.
     
@@ -29,6 +29,16 @@ def draw_annotation_maps(seq, annot_maps,
         for i in range(len(default_colors), len(annot_maps)):
             default_colors.append('black')
 
+    # make sure the list of feature wrappers is the same length as the
+    # list of input annotation maps.
+    if wrappers is None:
+        wrappers = [ None ] * len(annot_maps)
+    else:
+        wrappers = list(wrappers)
+        for i in range(len(wrappers), len(annot_maps)):
+            wrappers.append(None)
+
+    # create an instance of the picture class, whatever it may be.
     p = picture_class(len(seq))
 
     ### underneath, draw each set of annotations
@@ -40,7 +50,7 @@ def draw_annotation_maps(seq, annot_maps,
         annots = annot_map[seq]
         new_map, max_text_length = \
                  convert_to_image_coords(seq, annots, p, default_color,
-                                         wrapper)
+                                         wrappers[n])
         l.append(new_map)
         maxmax_text_length = max(maxmax_text_length, max_text_length)
 

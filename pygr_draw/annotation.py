@@ -61,7 +61,7 @@ class _PictureCoordAnnotGroup(object):
         self.text_length = text_length
 
 def convert_to_image_coords(seq, all_annotations, picture_obj, default_color,
-                            wrapper=None):
+                            wrapper):
     """
     @CTB
     """
