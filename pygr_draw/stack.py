@@ -14,6 +14,7 @@ def stack_annotations(seq, nlmsa, sort_annotations_by=sort_by_length):
         annotations.sort(sort_annotations_by) # e.g. length
 
     for annotation in annotations:
+            
         assert not slots_d.has_key(annotation.id)
 
         subseq = annotation.sequence

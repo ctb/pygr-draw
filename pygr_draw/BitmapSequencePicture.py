@@ -4,7 +4,7 @@ from BaseSequencePicture import BaseSequencePicture
 from cStringIO import StringIO
 from PIL import Image, ImageDraw
 
-class ColorList:
+class ColorList(object):
     pass
 
 colors = ColorList()

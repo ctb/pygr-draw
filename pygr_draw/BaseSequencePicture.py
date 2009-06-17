@@ -3,7 +3,7 @@ from stack import stack_annotations
 from pygr.sequence import Sequence
 from pygr import seqdb, cnestedlist
 
-class BaseSequencePicture:
+class BaseSequencePicture(object):
     SUFFIX = None                       # must define
     colors = None                       # must define
     
@@ -11,7 +11,7 @@ class BaseSequencePicture:
         # sequence_length is used only to calculate the tick spacing
         self.sequence_length = sequence_length
 
-        # resolution controls the granlarity used to calculate overlaps.
+        # resolution controls the granularity used to calculate overlaps.
         self.resolution = resolution
         
         self.imageseq = Sequence('A'*resolution, 'bitmap')

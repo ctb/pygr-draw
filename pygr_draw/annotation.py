@@ -2,7 +2,7 @@ from pygr import cnestedlist, seqdb
 
 TEXT_OFFSET = 6
 
-class Annotation:
+class Annotation(object):
     def __init__(self, name, id, start, stop, color=None):
         self.name = name 
         self.id = id
@@ -10,7 +10,7 @@ class Annotation:
         self.stop = stop
         self.color = color
 
-class AnnotationGroup:
+class AnnotationGroup(object):
     group = True
     
     def __init__(self, name, seq, annots, color=None):
@@ -60,14 +60,15 @@ class _PictureCoordAnnotGroup(object):
         self.color = color
         self.text_length = text_length
 
-def convert_to_image_coords(seq, all_annotations, picture_obj, default_color):
+def convert_to_image_coords(seq, all_annotations, picture_obj, default_color,
+                            wrapper=None):
     """
     @CTB
     """
     
     new_annot_d = convert_object_coords(all_annotations, seq.start,
                                         len(seq), picture_obj,
-                                        default_color)
+                                        default_color, wrapper)
 
     # build nlmsa
     new_map = cnestedlist.NLMSA('test', mode='memory', use_virtual_lpo=True)
@@ -77,7 +78,10 @@ def convert_to_image_coords(seq, all_annotations, picture_obj, default_color):
 
     adb = seqdb.AnnotationDB(new_annot_d, picture_obj.genome)
     for v in adb.values():
-        new_map.addAnnotation(v)
+        try:
+            new_map.addAnnotation(v)
+        except IndexError:
+            continue
 
         z = v.feature_start - v.text_length
         if z < 0:
@@ -86,8 +90,18 @@ def convert_to_image_coords(seq, all_annotations, picture_obj, default_color):
     new_map.build()
     return (new_map, max_text_length)
 
+def default_wrapper(annot):
+    default_indicator = object()
+    def f(name, default=default_indicator):
+        if default is default_indicator:
+            return getattr(annot, name)
+        else:
+            return getattr(annot, name, default)
+
+    return f
+
 def convert_object_coords(all_annotations, seq_start, seq_length, picture_obj,
-                          default_color):
+                          default_color, wrapper):
     """
     @CTB
     """
@@ -96,27 +110,34 @@ def convert_object_coords(all_annotations, seq_start, seq_length, picture_obj,
 
     d = {}
     
-    for n, annot in enumerate(all_annotations):
-        name = getattr(annot, 'name', '')
-        is_group = getattr(annot, 'group', False)
-        color = getattr(annot, 'color', default_color)
+    for n, (seq, annot, _) in enumerate(all_annotations.edges()):
+        if wrapper:
+            getter = wrapper(annot)
+        else:
+            getter = default_wrapper(annot)
+            
+        name = getter('name', '')
+        is_group = getter('group', False)
+        color = getter('color', default_color)
         
         text_length = picture_obj._calc_textsize(name)[0]
 
-        corrected_start = annot.sequence.start - seq_start
+        sequence = seq
+        print repr(sequence)
+        corrected_start = sequence.start - seq_start
         feature_start = float(corrected_start) * length_ratio
 
-        corrected_start = annot.sequence.start - seq_start
-
-        feature_start = float(corrected_start) * length_ratio
         block_start = feature_start - text_length
         block_start = int(round(block_start))
         block_start = max(block_start, 0)
 
-        corrected_stop = annot.sequence.stop - seq_start
+        corrected_stop = sequence.stop - seq_start
         block_stop = float(corrected_stop) * length_ratio
         block_stop = int(round(block_stop))
         block_stop = max(block_stop, 0)
+
+        if block_start == block_stop:
+            block_stop += 1
 
         if not is_group:
             new_annot = _PictureCoordAnnot(name, block_start, block_stop,
@@ -126,7 +147,7 @@ def convert_object_coords(all_annotations, seq_start, seq_length, picture_obj,
             
             sub_annots = []
 
-            for (start, stop) in annot.annots:
+            for (start, stop) in getter('annots'):
                 new_start = start - seq_start
                 new_start = float(new_start) * length_ratio
                 new_stop = stop - seq_start
@@ -147,4 +168,3 @@ def convert_object_coords(all_annotations, seq_start, seq_length, picture_obj,
         d[n] = new_annot
 
     return d
-    
