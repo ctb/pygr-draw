@@ -69,7 +69,7 @@ class PDFSequencePicture(BaseSequencePicture):
 
             self.canvas.rect(start_x, start_y, w, h, fill=1)
 
-    def _draw_feature(self, slot, start, stop, color=None):
+    def _draw_feature(self, slot, start, stop, color=None, name=''):
         if color is None:
             color = self.colors.red
             

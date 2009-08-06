@@ -1,4 +1,8 @@
+put _draw_feature_name call inside of _draw_feature.
+
 black blob at bottom for suitably deep annotations (that run off the edge...)
 
 labels on the side?
 coordinate labels?
+
+

@@ -69,7 +69,8 @@ class BaseSequencePicture(object):
                 for (start, stop) in annotation.annots:
                     self._draw_feature(slot, start, stop, color)
             else:
-                self._draw_feature(slot, feat_start, stop, color)
+                self._draw_feature(slot, feat_start, stop, color,
+                                   name=annotation.name)
                 self._draw_feature_name(annotation.name, feat_start, slot)
 
         return max_slot_used + 1

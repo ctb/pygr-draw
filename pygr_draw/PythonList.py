@@ -4,23 +4,22 @@ from BaseSequencePicture import BaseSequencePicture
 from cStringIO import StringIO
 from PIL import Image, ImageDraw
 
-class ColorList(object):
+colors_d = dict(white='white',
+               red='red',
+               green='green',
+               blue='blue',
+               orange='orange',
+               purple='purple',
+               black='black')
+class Bag(object):
     pass
+colors = Bag()
+colors.__dict__.update(colors_d)
 
-colors = ColorList()
-colors.white = (255, 255, 255)
-colors.red = (255, 0, 0)
-colors.green = (0, 255, 0)
-colors.blue = (0, 0, 255)
-colors.orange = (255, 180, 0)
-colors.purple = (255, 0, 255)
-colors.black = (0, 0, 0)
-
-class BitmapSequencePicture(BaseSequencePicture):
-    SUFFIX = '.png'
+class PythonList(BaseSequencePicture):
+    SUFFIX = '.FOO'
     
     colors = colors
-    
     SEQUENCE_HEIGHT = 2
     
     SEQUENCE_TICK_HEIGHT = 6
@@ -36,6 +35,7 @@ class BitmapSequencePicture(BaseSequencePicture):
     FEATURE_SPACING = 12
     
     def __init__(self, sequence_length, size=(1000,1000)):
+        self.feature_list = []
         self.size = size
         resolution = size[0] / 2        # good default?
         
@@ -99,9 +99,12 @@ class BitmapSequencePicture(BaseSequencePicture):
 
         assert width > 0
 
-        self.draw.rectangle((start_x, start_y,
-                             start_x+width, start_y + self.FEATURE_HEIGHT),
-                            fill=color, outline=colors.black)
+        self.feature_list.append((name,
+                                  slot,
+                                  int(start),
+                                  int(stop),
+                                  color))
+
         self.max_y = max(start_y + self.FEATURE_HEIGHT, self.max_y)
 
     def _draw_feature_name(self, name, start_x, slot):
@@ -111,7 +114,6 @@ class BitmapSequencePicture(BaseSequencePicture):
         start_y = self.SEQUENCE_TEXT_OFFSET + (slot + 1)*self.FEATURE_SPACING
 
         xsize = self._calc_textsize(name)[0]
-        self.draw.text((start_x - xsize, start_y), name, fill=colors.black)
 
     def _calc_textsize(self, text):
         return self.draw.textsize(text)
@@ -130,15 +132,10 @@ class BitmapSequencePicture(BaseSequencePicture):
 #        if width + start_x > self.w - self.SEQUENCE_OFFSET:
 #            width = self.w - self.SEQUENCE_OFFSET - start_x
 
-        self.draw.rectangle((start_x, start_y,
-                             start_x+width, start_y + self.THIN_FEATURE_HEIGHT),
-                            fill=color, outline=color)
+        #self.draw.rectangle((start_x, start_y,
+        #                     start_x+width, start_y + self.THIN_FEATURE_HEIGHT),
+        #                    fill=color, outline=color)
         self.max_y = max(start_y + self.THIN_FEATURE_HEIGHT, self.max_y)
 
     def finalize(self):
-        fp = StringIO()
-
-        cropped_image = self.image.crop((0, 0, self.w, self.max_y + self.FEATURE_HEIGHT))
-        cropped_image.save(fp, "PNG")
-
-        return fp.getvalue()
+        return self.feature_list

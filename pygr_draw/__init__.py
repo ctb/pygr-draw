@@ -2,7 +2,7 @@
 Utility for drawing annotations on sequences; uses pygr underneath.
 """
 
-__version__ = "0.3"
+__version__ = "0.5"
 
 import pygr
 
@@ -12,6 +12,7 @@ from stack import stack_annotations
 
 from PDFSequencePicture import PDFSequencePicture
 from BitmapSequencePicture import BitmapSequencePicture
+from PythonList import PythonList
 
 from pygr import cnestedlist
 
