@@ -89,17 +89,15 @@ class _PictureCoordAnnot(object):
 class _PictureCoordAnnotGroup(object):
     group = True
     
-    def __init__(self, name, annots, color, feature_start, text_length):
+    def __init__(self, name, start, stop,
+                 annots, color, feature_start, text_length):
         self.id = 'bitmap'
         self.name = name
         
         self.annots = [(min(a), max(a)) for a in annots]
 
-        start = min([ a[0] for a in annots ])
-        stop = max([ a[1] for a in annots ])
-        
-        self.start = min(start, stop) 
-        self.stop = max(start, stop)
+        self.start = start
+        self.stop = stop
 
         self.feature_start = feature_start
         self.color = color
@@ -212,8 +210,9 @@ def convert_object_coords(slice, seq_start, seq_length, picture_obj,
 
                 sub_annots.append((new_start, new_stop))
 
-            new_feature = _PictureCoordAnnotGroup(name, sub_annots, color,
-                                                feature_start, text_length)
+            new_feature = _PictureCoordAnnotGroup(name, block_start, block_stop,
+                                                  sub_annots, color,
+                                                  feature_start, text_length)
             
         # add new 'picture' feature into dict...
         d[n] = new_feature
