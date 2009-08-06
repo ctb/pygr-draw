@@ -4,3 +4,6 @@
 *~
 *.png
 *.pdf
+pygr_draw.egg-info/
+build
+dist
