@@ -20,7 +20,6 @@ class PDFSequencePicture(BaseSequencePicture):
     SEQUENCE_BASE = 100                 # horizontal margin
     SEQUENCE_OFFSET = 100               # vertical margin
 
-    H_CORRECTION = 50
     TEXT_OFFSET = 8
     
     FEATURE_HEIGHT = 8
@@ -30,7 +29,7 @@ class PDFSequencePicture(BaseSequencePicture):
     
     def __init__(self, sequence_length):
         self.w, self.h = landscape(letter)
-        BaseSequencePicture.__init__(self, sequence_length, 500)
+        BaseSequencePicture.__init__(self, sequence_length, int(self.w))
         
         self.data_fp = StringIO()
         self.canvas = canvas.Canvas(self.data_fp, pagesize=(self.w,self.h))
@@ -39,8 +38,9 @@ class PDFSequencePicture(BaseSequencePicture):
 
         # conversion factor
         self.seq_to_canvas = float((self.w - 2*self.SEQUENCE_BASE) /
-                                   self.seqlen)
-
+                                   self.resolution)
+        print "AA",self.w,self.seqlen
+        
     def draw_sequence_line(self):
         start_x = self.SEQUENCE_BASE
         start_y = self.SEQUENCE_OFFSET + self.SEQUENCE_TICK_HEIGHT / 2 -\
@@ -65,8 +65,9 @@ class PDFSequencePicture(BaseSequencePicture):
         w = self.SEQUENCE_TICK_WIDTH
 
         for loc in ticklocations:
-            start_x = self.SEQUENCE_BASE + int(loc * self.seq_to_canvas)
-
+            print loc,w
+            start_x = self.SEQUENCE_BASE + int(loc * self.seq_to_canvas / float(self.seqlen) * self.resolution)
+            print start_x, self.seq_to_canvas
             self.canvas.rect(start_x, start_y, w, h, fill=1)
 
     def _calc_textsize(self, name):
@@ -74,17 +75,23 @@ class PDFSequencePicture(BaseSequencePicture):
         return [text_size]
     
     def _draw_feature(self, slot, start, stop, color=None, name=''):
+        print "YY",slot,start,stop
         if color is None:
             color = self.colors.red
             
         start_y = (self.SEQUENCE_OFFSET + (slot+1)*self.FEATURE_SPACING)
         start_y = self.h - start_y
 
-        start_x = start + self.H_CORRECTION
+        start = int(self.seq_to_canvas * start)
+        stop = int(self.seq_to_canvas * stop)
+        
+        start_x = start + self.SEQUENCE_BASE
         width = stop - start
+        
         width = max(width, 1)
 
         print start, stop
+        print self.seq_to_canvas
         assert width > 0
 
         self.canvas.setFillColor(color)
@@ -94,11 +101,12 @@ class PDFSequencePicture(BaseSequencePicture):
     def _draw_feature_name(self, name, start_x, slot):
         start_y = self.SEQUENCE_OFFSET + self.TEXT_OFFSET + (slot + 1) * self.FEATURE_SPACING
         start_y = self.h - start_y
-        start_x = start_x + self.H_CORRECTION - len(name)*7
+        start_x = start_x + self.SEQUENCE_BASE - self._calc_textsize(name)[0]
         self.canvas.setFillColor(self.colors.black)
         self.canvas.drawString(start_x, start_y, name)
 
     def _draw_thin_feature(self, slot, start, stop, color=None):
+        print "XX",slot,start,stop
         if color is None:
             color = self.colors.red
             
@@ -106,12 +114,15 @@ class PDFSequencePicture(BaseSequencePicture):
                   self.THIN_FEATURE_OFFSET
         start_y = self.h - start_y
 
-        start_x = start + self.H_CORRECTION
-        width = stop - start_x
+        start = int(self.seq_to_canvas * start)
+        stop = int(self.seq_to_canvas * stop)
+
+        start_x = start + self.SEQUENCE_BASE
+        width = stop - start
         width = max(width, 1)
 
-        if width + start_x > self.w - self.SEQUENCE_OFFSET:
-            width = self.w - self.SEQUENCE_OFFSET - start_x
+        if width + start_x > self.w - self.SEQUENCE_BASE:
+            width = self.w - self.SEQUENCE_BASE - start_x
 
         self.canvas.setFillColor(color)
         self.canvas.setStrokeColor(color)
