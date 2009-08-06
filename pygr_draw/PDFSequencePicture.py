@@ -69,6 +69,10 @@ class PDFSequencePicture(BaseSequencePicture):
 
             self.canvas.rect(start_x, start_y, w, h, fill=1)
 
+    def _calc_textsize(self, name):
+        text_size = len(name)*7
+        return [text_size]
+    
     def _draw_feature(self, slot, start, stop, color=None, name=''):
         if color is None:
             color = self.colors.red
@@ -90,7 +94,7 @@ class PDFSequencePicture(BaseSequencePicture):
     def _draw_feature_name(self, name, start_x, slot):
         start_y = self.SEQUENCE_OFFSET + self.TEXT_OFFSET + (slot + 1) * self.FEATURE_SPACING
         start_y = self.h - start_y
-        start_x = start_x + self.H_CORRECTION
+        start_x = start_x + self.H_CORRECTION - len(name)*7
         self.canvas.setFillColor(self.colors.black)
         self.canvas.drawString(start_x, start_y, name)
 
