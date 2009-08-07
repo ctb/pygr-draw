@@ -21,6 +21,10 @@ annotations2['gene5'] = AnnotationGroup('gene5', sequence_name,((7500, 8500), (1
 
 annotations2['gene6'] = AnnotationGroup('gene6', sequence_name,((500, 600), (13000,14250)),color=colors.red)
 
+#annotations2['gene7'] = AnnotationGroup('geneStart', sequence_name,((0, 600), (3000,4250)),color=colors.green)
+
+#annotations2['gene8'] = AnnotationGroup('NoDraw', sequence_name,((10000,12000),(13000,17250)),color=colors.yellow)
+
 annotations_map = pygr_draw.create_annotation_map(annotations2, genome)
 
 p = pygr_draw.draw_annotation_maps(genome[sequence_name],(annotations_map,),picture_class=picture_class)
