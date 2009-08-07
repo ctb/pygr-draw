@@ -39,7 +39,8 @@ class PDFSequencePicture(BaseSequencePicture):
         # conversion factor
         self.seq_to_canvas = float((self.w - 2*self.SEQUENCE_BASE) /
                                    self.resolution)
-        print "AA",self.w,self.seqlen
+        print "*** w / seqlen ***"
+        print self.w,' / ',self.seqlen
         
     def draw_sequence_line(self):
         start_x = self.SEQUENCE_BASE
@@ -65,9 +66,9 @@ class PDFSequencePicture(BaseSequencePicture):
         w = self.SEQUENCE_TICK_WIDTH
 
         for loc in ticklocations:
-            print loc,w
+            print 'Tick Sequence Location:',loc
             start_x = self.SEQUENCE_BASE + int(loc * self.seq_to_canvas / float(self.seqlen) * self.resolution)
-            print start_x, self.seq_to_canvas
+            print 'Tick Canvas Start:',start_x
             self.canvas.rect(start_x, start_y, w, h, fill=1)
 
     def _calc_textsize(self, name):
@@ -75,7 +76,6 @@ class PDFSequencePicture(BaseSequencePicture):
         return [text_size]
     
     def _draw_feature(self, slot, start, stop, color=None, name=''):
-        print "YY",slot,start,stop
         if color is None:
             color = self.colors.red
             
@@ -90,8 +90,8 @@ class PDFSequencePicture(BaseSequencePicture):
         
         width = max(width, 1)
 
-        print start, stop
-        print self.seq_to_canvas
+        print 'Converted Feature (start, stop)', start, stop
+
         assert width > 0
 
         self.canvas.setFillColor(color)
@@ -104,9 +104,9 @@ class PDFSequencePicture(BaseSequencePicture):
         start_x = (start_x + self.SEQUENCE_BASE - self._calc_textsize(name)[0])*self.seq_to_canvas
         self.canvas.setFillColor(self.colors.black)
         self.canvas.drawString(start_x, start_y, name)
+        print '---', name, '---'
 
     def _draw_thin_feature(self, slot, start, stop, color=None):
-        print "XX",slot,start,stop
         if color is None:
             color = self.colors.red
             
