@@ -19,7 +19,7 @@ colors = picture_class.colors
 ### create a bunch of annotations
 
 annotations1 = {}
-annotations1['exon1'] = Annotation('exon1', sequence_name, 0, 50,
+annotations1['exon1'] = Annotation('exon1', sequence_name, 0, 5000,
                                    color=colors.blue)
 annotations1['exon2'] = Annotation('exon2', sequence_name, 200, 500,
                                    color=colors.green)
