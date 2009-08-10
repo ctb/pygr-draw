@@ -95,9 +95,9 @@ class PDFSequencePicture(BaseSequencePicture):
     def _draw_feature_name(self, name, start_x, slot):
         start_y = self.SEQUENCE_OFFSET + self.TEXT_OFFSET + (slot + 1) * self.FEATURE_SPACING
         start_y = self.h - start_y
-        start_x = (start_x + self.SEQUENCE_BASE - self._calc_textsize(name)[0])*self.seq_to_canvas
+        start_x = (start_x + self.SEQUENCE_BASE)*self.seq_to_canvas
         self.canvas.setFillColor(self.colors.black)
-        self.canvas.drawCentredString(start_x, start_y, name)
+        self.canvas.drawRightString(start_x, start_y, name)
 
     def _draw_thin_feature(self, slot, start, stop, color=None):
         if color is None:
