@@ -48,7 +48,11 @@ def draw_annotation_maps(seq, annot_maps,
     for n, annot_map in enumerate(annot_maps):
         default_color = default_colors[n]
 
-        annots = annot_map[seq]
+        try:
+            annots = annot_map[seq]
+        except KeyError:                # sequence not in map
+            continue
+        
         new_map, max_text_length = \
                  convert_to_image_coords(seq, annots, p, default_color,
                                          wrappers[n])
