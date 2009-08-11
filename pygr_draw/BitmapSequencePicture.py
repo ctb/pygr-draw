@@ -1,3 +1,8 @@
+# CTB: known bug in the final 'crop' (see 'finalize').  If the bitmap
+# is extended by the crop, the extension will be black.  Half-assed
+# solution: extend 'y' in the constructor, because it will be cropped
+# to fit the max size anyway.
+
 from stack import stack_annotations
 from BaseSequencePicture import BaseSequencePicture
 
@@ -35,7 +40,7 @@ class BitmapSequencePicture(BaseSequencePicture):
     THIN_FEATURE_OFFSET = 3
     FEATURE_SPACING = 12
     
-    def __init__(self, sequence_length, size=(1000,1000)):
+    def __init__(self, sequence_length, size=(1000,5000)):
         self.size = size
         resolution = size[0] / 2        # good default?
         
