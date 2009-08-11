@@ -1,6 +1,5 @@
 from pygr import cnestedlist, seqdb
-
-TEXT_OFFSET = 6
+from pygr.nlmsa_utils import EmptyAlignmentError
 
 class Annotation(object):
     def __init__(self, name, id, start, stop, color=None):
@@ -129,7 +128,11 @@ def convert_to_image_coords(seq, slice, picture_obj, default_color,
         if z < 0:
             max_text_length = max(max_text_length, -z)
 
-    new_map.build()
+    try:
+        new_map.build()
+    except EmptyAlignmentError:
+        new_map = None
+    
     return (new_map, max_text_length)
 
 def convert_object_coords(slice, seq_start, seq_length, picture_obj,

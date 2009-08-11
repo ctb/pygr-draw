@@ -52,8 +52,10 @@ def draw_annotation_maps(seq, annot_maps,
         new_map, max_text_length = \
                  convert_to_image_coords(seq, annots, p, default_color,
                                          wrappers[n])
-        l.append(new_map)
-        maxmax_text_length = max(maxmax_text_length, max_text_length)
+        
+        if new_map:
+            l.append(new_map)
+            maxmax_text_length = max(maxmax_text_length, max_text_length)
 
     p.set_left_margin_offset(maxmax_text_length)
     
