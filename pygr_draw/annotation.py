@@ -34,7 +34,7 @@ class FeatureWrapper(object):
         self.feature = feature          # *unwrapped* feature
         self.values = values            # override values, e.g. color
 
-    def __getattr__(self, wrapped_feature, attrname, default=default_arg):
+    def __getattr__(self, attrname, default=default_arg):
         # override?
         if attrname in self.values:
             return self.values[attrname]
