@@ -50,7 +50,7 @@ def draw_annotation_maps(seq, annot_maps,
 
         try:
             annots = annot_map[seq]
-        except KeyError:                # sequence not in map
+        except (KeyError, TypeError): # sequence not in map, or map is None
             continue
         
         new_map, max_text_length = \
