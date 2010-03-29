@@ -29,7 +29,7 @@ TODO: working with pygr annotations.
 Contributors
 ------------
 
-Marie Buckner and Alex Nolley both worked on early versions of pygr_draw,
+Marie Buckner and Owen Pierce both worked on early versions of pygr_draw,
 helping find, debug, and fix some of the more annoying scaling issues.
 
 Evan Bowling provided the inspiration for the JSON feature output.
