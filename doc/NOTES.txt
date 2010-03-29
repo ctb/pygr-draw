@@ -1,0 +1,27 @@
+---
+
+From lyorn, to view your files thru the Web: ::
+
+   mkdir ~/.html
+   ln -fs /path/to/pygr-draw /u/<username>/.html
+
+(replace /path/to/ and <username> appropriately). Now the files should
+be accessible at
+
+   http://lyorn.idyll.org/~<username>/pygr-draw/
+
+---
+
+JavaScript toolkit/drawing options:
+
+http://ivory.idyll.org/blog/may-08/lazyweb-javascript-image-stuff
+
+Some good references in there; ixany on SVG, but check out
+
+   http://plugins.jquery.com/project/Draw
+   http://hackmap.blogspot.com/2008/04/comparative-genomics-with-openlayers.html
+   http://openlayers.org/dev/examples/
+   http://processingjs.org/
+
+We can always go with image maps, if necessary, but they're not as nice
+as JS could be.
