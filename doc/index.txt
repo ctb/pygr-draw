@@ -1,0 +1,5 @@
+`Simple annotation example <simple-example.html>`__ - blobs on sequences.
+
+`Group annotation example <group-example.html>`__ -- gene structures, etc.
+
+`Working with pygr alignments <wrapper-example.html>`__ -- displaying existing Multiple Sequence Alignments etc.

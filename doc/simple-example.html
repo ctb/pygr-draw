@@ -3,13 +3,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
 <title>Using pygr-draw with simple annotations</title>
 <style type="text/css">
 
 /*
-:Author: David Goodger (goodger@python.org)
-:Id: $Id: html4css1.css 5196 2007-06-03 20:25:28Z wiemann $
+:Author: David Goodger
+:Contact: goodger@users.sourceforge.net
+:Date: $Date: 2005-12-18 01:56:14 +0100 (Sun, 18 Dec 2005) $
+:Revision: $Revision: 4224 $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -115,7 +117,7 @@ div.line-block div.line-block {
   margin-left: 1.5em }
 
 div.sidebar {
-  margin: 0 0 0.5em 1em ;
+  margin-left: 1em ;
   border: medium outset ;
   padding: 1em ;
   background-color: #ffffee ;
@@ -221,7 +223,8 @@ pre.address {
 
 pre.literal-block, pre.doctest-block {
   margin-left: 2em ;
-  margin-right: 2em }
+  margin-right: 2em ;
+  background-color: #eeeeee }
 
 span.classifier {
   font-family: sans-serif ;
@@ -278,6 +281,9 @@ h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
 h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
   font-size: 100% }
 
+tt.docutils {
+  background-color: #eeeeee }
+
 ul.auto-toc {
   list-style-type: none }
 
@@ -286,7 +292,6 @@ ul.auto-toc {
 <body>
 <div class="document" id="using-pygr-draw-with-simple-annotations">
 <h1 class="title">Using pygr-draw with simple annotations</h1>
-
 <p>First, import the necessary components, load the genome/FASTA database in,
 and pick a sequence:</p>
 <blockquote>
@@ -303,56 +308,44 @@ and pick a sequence:</p>
 &gt;&gt;&gt; from pygr_draw import Annotation
 </pre>
 </blockquote>
-<p>Instantiate the sequence picture class; in this case, use a
-<tt class="docutils literal"><span class="pre">BitmapSequencePicture</span></tt> to produce a PNG.  You can also use
-<tt class="docutils literal"><span class="pre">PDFSequencePicture</span></tt> to create PDFs, with otherwise identical code.</p>
+<p>Create a Draw class; specify a filename ending in '.png' to draw a bitmap,
+or use '.pdf' to draw a PDF:</p>
 <blockquote>
 <pre class="doctest-block">
-&gt;&gt;&gt; picture_class = pygr_draw.BitmapSequencePicture
-&gt;&gt;&gt; colors = picture_class.colors
+&gt;&gt;&gt; image = pygr_draw.Draw('simple-example.png')
+&gt;&gt;&gt; colors = image.colors
 </pre>
 </blockquote>
 <p>Create a bunch of overlapping annotations in various colors:</p>
 <blockquote>
 <pre class="doctest-block">
-&gt;&gt;&gt; annotations1 = {}
-&gt;&gt;&gt; annotations1['exon1'] = Annotation('exon1', sequence_name, 0, 500,
-...                                    color=colors.blue)
-&gt;&gt;&gt; annotations1['exon2'] = Annotation('exon2', sequence_name, 200, 500,
-...                                    color=colors.green)
-&gt;&gt;&gt; annotations1['exon3'] = Annotation('exon3', sequence_name, 250, 300,
-...                                    color=colors.black)
+&gt;&gt;&gt; annots = []
+&gt;&gt;&gt; annots.append(Annotation('exon1', sequence_name, 0, 500, color=colors.blue))
+&gt;&gt;&gt; annots.append(Annotation('exon2', sequence_name, 200, 500, color=colors.green))
+&gt;&gt;&gt; annots.append(Annotation('exon3', sequence_name, 250, 300, color=colors.black))
 </pre>
 <pre class="doctest-block">
 &gt;&gt;&gt; for i in range(250, 500, 10):
 ...    name = 'exon%d' % (i + 4)
 ...    start = i
 ...    end = 2000
-...    annotations1[name] = Annotation(name, sequence_name, start, end,
-...                                    color=colors.red)
+...    annots.append(Annotation(name, sequence_name, start, end, color=colors.red))
 </pre>
 </blockquote>
-<p>Convert the annotations into an NLMSA annotations map:</p>
+<p>Add the annotations onto the image as a track, tied to the genome:</p>
 <blockquote>
 <pre class="doctest-block">
-&gt;&gt;&gt; annotations_map = pygr_draw.create_annotation_map(annotations1, genome)
+&gt;&gt;&gt; image.add_track(annots, genome)
 </pre>
 </blockquote>
-<p>Draw 'em:</p>
+<p>Draw and save the interval you want:</p>
 <blockquote>
 <pre class="doctest-block">
-&gt;&gt;&gt; p = pygr_draw.draw_annotation_maps(genome[sequence_name][:4000],
-...                                    (annotations_map,),
-...                                    picture_class=picture_class)
+&gt;&gt;&gt; subsequence = genome[sequence_name][:4000]
+&gt;&gt;&gt; image.save(subsequence)
 </pre>
 </blockquote>
-<p>And then save the image:</p>
-<blockquote>
-<pre class="doctest-block">
-&gt;&gt;&gt; image = p.finalize()
-&gt;&gt;&gt; open('simple-example.png', 'w').write(image)
-</pre>
-</blockquote>
+<p>Voila!</p>
 <img alt="simple-example.png" src="simple-example.png" />
 </div>
 </body>

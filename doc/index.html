@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
-<title>Using pygr-draw with alignments (NLMSAs)</title>
+<title></title>
 <style type="text/css">
 
 /*
@@ -290,70 +290,10 @@ ul.auto-toc {
 </style>
 </head>
 <body>
-<div class="document" id="using-pygr-draw-with-alignments-nlmsas">
-<h1 class="title">Using pygr-draw with alignments (NLMSAs)</h1>
-<p>First, import the necessary components, load the genome/FASTA database in,
-and pick two sequences:</p>
-<blockquote>
-<pre class="doctest-block">
-&gt;&gt;&gt; from pygr import seqdb, cnestedlist
-&gt;&gt;&gt; genome = seqdb.BlastDB('example.fa')
-&gt;&gt;&gt; seq1 = genome['chrI']
-&gt;&gt;&gt; seq2 = genome['chrII']
-</pre>
-</blockquote>
-<p>Build an alignment object (a.k.a. &quot;NLMSA&quot;):</p>
-<blockquote>
-<pre class="doctest-block">
-&gt;&gt;&gt; al = cnestedlist.NLMSA('chicago', mode='memory', pairwiseMode=True)
-</pre>
-</blockquote>
-<p>Create some (arbitrary) alignments:</p>
-<blockquote>
-<pre class="doctest-block">
-&gt;&gt;&gt; al += seq1
-&gt;&gt;&gt; al[seq1[50:500]] += seq2[100:550]
-&gt;&gt;&gt; al[seq1[2000:2100]] += seq2[400:500]
-&gt;&gt;&gt; al.build()
-</pre>
-</blockquote>
-<p>Now, import pygr_draw and set it up to produce a png:</p>
-<blockquote>
-<pre class="doctest-block">
-&gt;&gt;&gt; import pygr_draw
-&gt;&gt;&gt; image = pygr_draw.Draw('wrapper-example.png')
-</pre>
-</blockquote>
-<p>In order for pygr_draw to know what to draw, we need to provide a
-wrapper to extract drawing information (name, color, etc.) from the
-alignment objects returned from the NLMSA; the generic way to do that
-is to use a <tt class="docutils literal"><span class="pre">SequenceWrapperFactory</span></tt>:</p>
-<blockquote>
-<pre class="doctest-block">
-&gt;&gt;&gt; from pygr_draw.annotation import SequenceWrapperFactory
-&gt;&gt;&gt; wrapper = SequenceWrapperFactory(color='red')
-</pre>
-</blockquote>
-<p>Add the track as a direct set of features, rather than using 'add_track':</p>
-<blockquote>
-<pre class="doctest-block">
-&gt;&gt;&gt; image.add_feature_map(al, wrapper=wrapper)
-</pre>
-</blockquote>
-<p>You can pass the same track in multiple times with different wrappers,
-overriding different attributes, too:</p>
-<blockquote>
-<pre class="doctest-block">
-&gt;&gt;&gt; image.add_feature_map(al, wrapper=SequenceWrapperFactory(name=''))
-</pre>
-</blockquote>
-<p>Now, draw!</p>
-<blockquote>
-<pre class="doctest-block">
-&gt;&gt;&gt; image.save(seq1)
-</pre>
-</blockquote>
-<img alt="wrapper-example.png" src="wrapper-example.png" />
+<div class="document">
+<p><a class="reference" href="simple-example.html">Simple annotation example</a> - blobs on sequences.</p>
+<p><a class="reference" href="group-example.html">Group annotation example</a> -- gene structures, etc.</p>
+<p><a class="reference" href="wrapper-example.html">Working with pygr alignments</a> -- displaying existing Multiple Sequence Alignments etc.</p>
 </div>
 </body>
 </html>

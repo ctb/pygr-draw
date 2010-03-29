@@ -16,10 +16,79 @@ from PythonList import PythonList
 
 from pygr import cnestedlist
 
+def get_picture_class(suffix='png'):
+    suffix = suffix.lower()
+    if suffix == 'pdf':
+        from PDFSequencePicture import PDFSequencePicture as klass
+    elif suffix == 'png':
+        from BitmapSequencePicture import BitmapSequencePicture as klass
+
+    return klass
+
+class Draw(object):
+    def __init__(self, filename=None, picture_class=None, default_colors=None):
+        if filename and not picture_class:
+            if '.' in filename:
+                suffix = filename.rsplit('.')[-1]
+                picture_class = get_picture_class(suffix)
+            else:
+                picture_class = get_picture_class(suffix)
+
+        self.filename = filename
+        self.picture_class = picture_class
+        self.colors = picture_class.colors
+        self.default_colors = None
+
+        self.maps = []
+        self.wrappers = []
+
+    def add_track(self, annotations, sequence_db, wrapper=None):
+        map = create_annotation_map(annotations, sequence_db)
+        self.add_feature_map(map, wrapper)
+
+    def add_feature_map(self, map, wrapper=None):
+        self.maps.append(map)
+        self.wrappers.append(wrapper)
+
+    def draw(self, seq):
+        picture = draw_annotation_maps(seq, self.maps,
+                                       default_colors=self.default_colors,
+                                       picture_class=self.picture_class,
+                                       wrappers=self.wrappers)
+
+        return picture
+
+    def save(self, seq, fp_or_filename=None):
+        if not fp_or_filename:
+            if not self.filename:
+                raise Exception("no file given, either in constructor or in save()")
+
+            fp_or_filename = self.filename
+        
+        try:
+            fp_or_filename.write
+            fp = fp_or_filename         # it's a file handle!
+            do_close = False
+        except AttributeError:
+            fp = open(fp_or_filename, 'w') # it's a filename!
+            do_close = True
+
+        picture = self.draw(seq)
+        image = picture.finalize()
+        fp.write(image)
+
+        if do_close:
+            fp.close()
+        
+
 def draw_annotation_maps(seq, annot_maps,
                          default_colors=None,
-                         picture_class=BitmapSequencePicture,
+                         picture_class=None,
                          wrappers=None):
+
+    if picture_class is None:
+        picture_class = get_picture_class 
+
     # make sure the list of default colors is the same length as the list
     # of input annotation maps.
     

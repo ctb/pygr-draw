@@ -20,28 +20,30 @@ Create some (arbitrary) alignments:
  >>> al[seq1[2000:2100]] += seq2[400:500]
  >>> al.build()
 
-Now, import pygr_draw and select the bitmap output:
+Now, import pygr_draw and set it up to produce a png:
 
  >>> import pygr_draw
- >>> picture_class = pygr_draw.BitmapSequencePicture
+ >>> image = pygr_draw.Draw('wrapper-example.png')
 
-We also need to build a wrapper to extract drawing information (name,
-color, etc.) from the alignment objects returned from the NLMSA; the
-generic way to do that is to use a ``SequenceWrapperFactory``:
+In order for pygr_draw to know what to draw, we need to provide a
+wrapper to extract drawing information (name, color, etc.) from the
+alignment objects returned from the NLMSA; the generic way to do that
+is to use a ``SequenceWrapperFactory``:
 
  >>> from pygr_draw.annotation import SequenceWrapperFactory
  >>> wrapper = SequenceWrapperFactory(color='red')
 
+Add the track as a direct set of features, rather than using 'add_track':
+
+ >>> image.add_feature_map(al, wrapper=wrapper)
+
+You can pass the same track in multiple times with different wrappers,
+overriding different attributes, too:
+
+ >>> image.add_feature_map(al, wrapper=SequenceWrapperFactory(name=''))
+
 Now, draw!
 
- >>> p = pygr_draw.draw_annotation_maps(seq1,
- ...                                    (al,),
- ...                                    picture_class=picture_class,
- ...                                    wrappers=(wrapper,))
-
-...and save.
-
- >>> image = p.finalize()
- >>> open('wrapper-example.png', 'w').write(image)
+ >>> image.save(seq1)
 
 .. image:: wrapper-example.png
