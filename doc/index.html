@@ -4,7 +4,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
-<title></title>
+<title>pygr_draw</title>
+<meta name="authors" content="C. Titus Brown" />
 <style type="text/css">
 
 /*
@@ -290,10 +291,42 @@ ul.auto-toc {
 </style>
 </head>
 <body>
-<div class="document">
+<div class="document" id="pygr-draw">
+<h1 class="title">pygr_draw</h1>
+<table class="docinfo" frame="void" rules="none">
+<col class="docinfo-name" />
+<col class="docinfo-content" />
+<tbody valign="top">
+<tr><th class="docinfo-name">Authors:</th>
+<td>C. Titus Brown</td></tr>
+<tr><th class="docinfo-name">Contact:</th>
+<td><a class="first last reference" href="mailto:ctb&#64;msu.edu">ctb&#64;msu.edu</a></td></tr>
+<tr class="field"><th class="docinfo-name">License:</th><td class="field-body">BSD</td>
+</tr>
+</tbody>
+</table>
+<p>pygr_draw provides a simple, robust way to draw features on
+sequences.  It's primarily intended to address the &quot;overlap&quot; problem,
+where you need to efficiently draw potentially stacked features.  It
+uses <a class="reference" href="http://pygr.org/">pygr</a> underneath, so it's pretty scalable
+and (more importantly) you can swap in pygr-compatible components
+depending on what you're doing.</p>
+<div class="section">
+<h1><a id="basic-examples" name="basic-examples">Basic examples</a></h1>
 <p><a class="reference" href="simple-example.html">Simple annotation example</a> - blobs on sequences.</p>
 <p><a class="reference" href="group-example.html">Group annotation example</a> -- gene structures, etc.</p>
+</div>
+<div class="section">
+<h1><a id="working-with-pygr-objects" name="working-with-pygr-objects">Working with pygr objects</a></h1>
+<p>TODO: working with pygr annotations.</p>
 <p><a class="reference" href="wrapper-example.html">Working with pygr alignments</a> -- displaying existing Multiple Sequence Alignments etc.</p>
+</div>
+<div class="section">
+<h1><a id="contributors" name="contributors">Contributors</a></h1>
+<p>Marie Buckner and Alex Nolley both worked on early versions of pygr_draw,
+helping find, debug, and fix some of the more annoying scaling issues.</p>
+<p>Evan Bowling provided the inspiration for the JSON feature output.</p>
+</div>
 </div>
 </body>
 </html>
