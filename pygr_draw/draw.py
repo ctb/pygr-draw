@@ -1,6 +1,7 @@
 from PythonList import PythonList
 from nlmsa import create_annotation_map
 from annotation import convert_to_image_coords
+from xyplot import SpanMap
 
 def get_picture_class(suffix='png'):
     suffix = suffix.lower()
@@ -99,10 +100,20 @@ def draw_annotation_maps(seq, annot_maps,
 
     ### underneath, draw each set of annotations
     l = []
-    maxmax_text_length = 0
+    maxmax_text_length = 0              # keep track of left margin offset
     for n, annot_map in enumerate(annot_maps):
         default_color = default_colors[n]
 
+        if isinstance(annot_map, SpanMap):
+            try:
+                annot_map.nlmsa[seq]
+                l.append(annot_map)
+            except KeyError:
+                pass
+            
+            # either way, no further processing needed
+            continue
+        
         try:
             annots = annot_map[seq]
         except (KeyError, TypeError): # sequence not in map, or map is None
@@ -123,7 +134,18 @@ def draw_annotation_maps(seq, annot_maps,
 
     start_slot = 0
     for new_map in l:
-        n_slots = p.draw_annotations(new_map, start_slot=start_slot)
+        if isinstance(new_map, SpanMap):
+            pairs = new_map.transform_coords_to_picture(seq, p)
+            n_slots = p._draw_xy_plot(start_slot,
+                                      seq.start, seq.stop,
+                                      pairs, new_map.height,
+                                      fill=p.colors.black)
+
+            n_slots = new_map.height
+        else:
+            n_slots = p.draw_annotations(new_map, start_slot=start_slot)
         start_slot += n_slots
+
+    ###
 
     return p

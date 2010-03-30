@@ -26,7 +26,22 @@ image.add_track(annots, genome)
 
 ###
 
-subsequence = genome[sequence_name][:4000]
+from pygr_draw.xyplot import SpanValue, SpanMap
+from pygr_draw import nlmsa
+
+x = []
+for k in range(0, 4000, 100):
+    value = float(k % 1000) / 1000.
+    a = SpanValue(sequence_name, k, 100, value)
+    x.append(a)
+msa = nlmsa.create_annotation_map(x, genome)
+map = SpanMap(msa, height=5)
+
+image.add_feature_map(map)
+
+###
+
+subsequence = genome[sequence_name][0:1000]
 image.save(subsequence)
 
 print 'Output in', image.filename
