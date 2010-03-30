@@ -1,3 +1,8 @@
+"""
+Library for taking lists/dicts of sequence annotations and creating an NLMSA.
+
+"""
+
 from pygr import cnestedlist, seqdb
 
 def create_annotation_map(annotations, sequence_db):

@@ -1,3 +1,8 @@
+"""
+Code for stacking annotations so that they don't overlap.
+
+"""
+
 def sort_by_length(a, b):
     return -cmp(len(a.sequence), len(b.sequence))
 

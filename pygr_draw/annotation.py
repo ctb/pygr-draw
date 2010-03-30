@@ -1,3 +1,8 @@
+"""
+Some simple annotation objects for representing sequence blobs & groups.
+
+"""
+
 from pygr import cnestedlist, seqdb
 from pygr.nlmsa_utils import EmptyAlignmentError
 

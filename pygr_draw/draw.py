@@ -1,3 +1,8 @@
+"""
+Actual drawing API to produce images.
+
+"""
+
 from PythonList import PythonList
 from nlmsa import create_annotation_map
 from annotation import convert_to_image_coords

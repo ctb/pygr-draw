@@ -1,3 +1,8 @@
+"""
+Code & machinery for plotting (y) values against (x) sequence coordinates.
+
+"""
+
 class SpanValue(object):
     def __init__(self, seq_id, start, width, value):
         self.id = seq_id
