@@ -19,6 +19,8 @@ Basic examples
 
 `Group annotation example <group-example.html>`__ -- gene structures, etc.
 
+TODO: JSON output example.
+
 Working with pygr objects
 -------------------------
 
