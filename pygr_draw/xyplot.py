@@ -11,10 +11,11 @@ class SpanValue(object):
         self.value = value
 
 class SpanMap(object):
-    def __init__(self, nlmsa, height=1, color=None):
+    def __init__(self, nlmsa, height=1, line_color=None, fill_color=None):
         self.nlmsa = nlmsa
         self.height = height
-        self.color = color
+        self.line_color = line_color
+        self.fill_color = fill_color
 
     def transform_coords_to_picture(self, seq, picture):
         image_width = len(picture.genome['bitmap'])
@@ -62,3 +63,35 @@ class SpanMap(object):
             new_pairs.append((new_pos, value))
 
         return new_pairs
+
+def build_span_value_list(sequence, nlmsa, resolution):
+    try:
+        slice = nlmsa[sequence]
+    except KeyError:
+        return None
+
+    features = slice.keys()
+
+    feature_start = min([ f.sequence.start for f in features ])
+    feature_stop = max([ f.sequence.stop for f in features ])
+
+    path = sequence.path
+    value_list = []
+    max_count = 0
+    for i in range(feature_start, feature_stop, resolution):
+        ival = path[i:i+resolution]
+        try:
+            count = len(nlmsa[ival])
+            if count > max_count:
+                max_count = count
+        except KeyError:
+            count = 0
+
+        value_list.append((i, count))
+
+    sv_list = []
+    for (start, count) in value_list:
+        ratio = count / float(max_count)
+        sv_list.append(SpanValue(sequence.id, start, resolution, ratio))
+
+    return sv_list

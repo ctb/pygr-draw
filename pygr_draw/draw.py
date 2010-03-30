@@ -140,11 +140,19 @@ def draw_annotation_maps(seq, annot_maps,
     start_slot = 0
     for new_map in l:
         if isinstance(new_map, SpanMap):
+            color = None
+            if new_map.line_color:
+                color = getattr(p.colors, new_map.line_color)
+                                
+            fill = None
+            if new_map.fill_color:
+                fill = getattr(p.colors, new_map.fill_color)
+                
             pairs = new_map.transform_coords_to_picture(seq, p)
             n_slots = p._draw_xy_plot(start_slot,
                                       seq.start, seq.stop,
                                       pairs, new_map.height,
-                                      fill=p.colors.black)
+                                      color=color, fill=fill)
 
             n_slots = new_map.height
         else:

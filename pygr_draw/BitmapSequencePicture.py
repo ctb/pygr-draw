@@ -143,7 +143,7 @@ class BitmapSequencePicture(BaseSequencePicture):
     def _draw_xy_plot(self, slot, start, stop, value_pairs, height=1,
                       color=None, fill=None):
         if color is None:
-            color = self.colors.red
+            color = self.colors.black
 
         y_base = self.SEQUENCE_OFFSET + ((slot+1) * self.FEATURE_SPACING)
 
@@ -151,14 +151,13 @@ class BitmapSequencePicture(BaseSequencePicture):
         pairs = []
 
         # are we drawing a filled histogram, or just a line plot?
-        if fill:
-            first_pos = value_pairs[0][0]
-            first_x = int(first_pos * self.seq_to_canvas+0.5) + \
-                      self.left_margin_offset
+        first_pos = value_pairs[0][0]
+        first_x = int(first_pos * self.seq_to_canvas+0.5) + \
+                  self.left_margin_offset
 
-            y_bottom = y_base + (self.FEATURE_HEIGHT * height)
-            
-            pairs.append((first_x, y_bottom))
+        y_bottom = y_base + (self.FEATURE_HEIGHT * height)
+
+        pairs.append((first_x, y_bottom))
 
         # plot the interior points
         for (pos, value) in value_pairs:
@@ -167,15 +166,16 @@ class BitmapSequencePicture(BaseSequencePicture):
 
             pairs.append((x,y))
 
+        pairs.append((x, y_bottom))
+
         # draw a filled histogram?
         if fill:
-            pairs.append((x, y_bottom))
             self.draw.polygon(pairs, outline=color, fill=fill)
         else:
             self.draw.line(pairs, fill=color)
 
         # increment max_y (for later clipping) appropriately.
-        self.max_y = self.max_y + self.FEATURE_HEIGHT*height
+        self.max_y = self.max_y + self.FEATURE_SPACING*height
 
     def finalize(self):
         fp = StringIO()

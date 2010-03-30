@@ -4,6 +4,8 @@ sequence_name ='chrI'
 
 import pygr_draw
 from pygr_draw import Annotation
+from pygr_draw.xyplot import SpanValue, SpanMap, build_span_value_list
+from pygr_draw import nlmsa
 
 image = pygr_draw.Draw('histogram-example.png')
 colors = image.colors
@@ -17,14 +19,12 @@ annots.append(Annotation('exon1', sequence_name, 0, 500, color=colors.blue))
 annots.append(Annotation('exon2', sequence_name, 200, 500, color=colors.green))
 annots.append(Annotation('exon3', sequence_name, 250, 300, color=colors.black))
 
-image.add_track(annots, genome)
+annot_map = nlmsa.create_annotation_map(annots, genome)
+image.add_feature_map(annot_map)
 
 ###
 
-# also add a histgraom, increasing from 0-1000 and then repeating, up to 4k.
-
-from pygr_draw.xyplot import SpanValue, SpanMap
-from pygr_draw import nlmsa
+# also add a histogram, increasing from 0-1000 and then repeating, up to 4k.
 
 x = []
 for k in range(0, 4000, 100):
@@ -32,8 +32,28 @@ for k in range(0, 4000, 100):
     a = SpanValue(sequence_name, k, 100, value)
     x.append(a)
 msa = nlmsa.create_annotation_map(x, genome)
-map = SpanMap(msa, height=5)
+map = SpanMap(msa, height=5, line_color='green', fill_color='black')
 
+image.add_feature_map(map)
+
+###
+
+# add another histogram, representing per-base features.
+sv_list = build_span_value_list(genome[sequence_name], annot_map, 1)
+msa = nlmsa.create_annotation_map(sv_list, genome)
+map = SpanMap(msa, height=5, line_color='black')
+image.add_feature_map(map)
+
+# add another histogram, representing binned features/10
+sv_list = build_span_value_list(genome[sequence_name], annot_map, 10)
+msa = nlmsa.create_annotation_map(sv_list, genome)
+map = SpanMap(msa, height=5, line_color='red', fill_color='green')
+image.add_feature_map(map)
+
+# add another histogram, representing binned features/50
+sv_list = build_span_value_list(genome[sequence_name], annot_map, 50)
+msa = nlmsa.create_annotation_map(sv_list, genome)
+map = SpanMap(msa, height=5, line_color='red', fill_color='green')
 image.add_feature_map(map)
 
 ###
