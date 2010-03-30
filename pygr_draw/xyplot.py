@@ -4,6 +4,10 @@ Code & machinery for plotting (y) values against (x) sequence coordinates.
 """
 
 class SpanValue(object):
+    """
+    An individual y value for a given x range.
+    
+    """
     def __init__(self, seq_id, start, width, value):
         self.id = seq_id
         self.start = start
@@ -65,6 +69,15 @@ class SpanMap(object):
         return new_pairs
 
 def build_span_value_list(sequence, nlmsa, resolution):
+    """
+    Produce a list of SpanValue objects for the interval at given resolution.
+    
+    Specifically, bin features in the given NLMSA by presence per
+    interval of len 'resolution' and produce a list of SpanValues
+    covering the interval.
+    
+    """
+    
     try:
         slice = nlmsa[sequence]
     except KeyError:
