@@ -24,19 +24,30 @@ class SpanMap(object):
 
         pairs = []
 
-        # first value: extend thru beginning
+        # here, for the first and last points, we need to see if we got
+        # SpanValue annotations that overlap the beginning and/or end of
+        # the sequence interval.  If we did, extend the drawing to the
+        # end(s) of the sequence interval; if not, that's fine, just
+        # calculate to the midpoint.
+
+        # first value: extend thru beginning, if it overlaps.
         v = values[0]
-        pairs.append((min((v.sequence.start + v.sequence.stop) / 2, seq.start),
-                      v.value))
+        if v.path.sequence.start <= seq.start:
+            pairs.append((seq.start, v.value))
+        else:
+            pairs.append(((v.sequence.start + v.sequence.stop) / 2, v.value))
 
         # intermediate values
         for v in values[1:-1]:
             pairs.append(((v.sequence.start + v.sequence.stop) / 2, v.value))
 
-        # last value: extend to end
+        # last value: extend to end?
         v = values[-1]
-        pairs.append((max((v.sequence.start + v.sequence.stop) / 2, seq.stop),
-                      v.value))
+        if v.path.sequence.stop >= seq.stop: # passes end of seq, extend.
+            pairs.append((seq.stop, v.value))
+        else:
+            # just use the midpoint.
+            pairs.append(((v.sequence.start + v.sequence.stop) / 2, v.value))
 
         # scale to canvas coordinates.
         new_pairs = []
