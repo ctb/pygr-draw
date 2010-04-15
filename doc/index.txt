@@ -28,6 +28,15 @@ TODO: working with pygr annotations.
 
 `Working with pygr alignments <wrapper-example.html>`__ -- displaying existing Multiple Sequence Alignments etc.
 
+Useful references
+-----------------
+
+pygr docs:
+
+`Working with annotations <http://pygr.org/docs/latest-release/tutorials/annotation2.html>`__
+
+`Working with alignments <http://pygr.org/docs/latest-release/tutorials/alignment.html>`__
+
 Contributors
 ------------
 
